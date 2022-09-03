@@ -1,0 +1,38 @@
+How to Migrate WP Site to EC2 with All In One WordPress Migration Plugin FOR FREE
+
+Problem: File upload for AI1WM plugin fails on large site uploads.
+Solution: Backup needs to be uploaded from FTP into site files.
+
+Requirements: AWS, FileZilla, PuttyGen, Putty, AI1WPM plugin version 6.77 (for import. export can be any version), Big File Uploads plugin
+
+1. Any version of plugin: Export site to file (NOTE: REMEMBER WP-ADMIN USER/PASSWORD)
+2. Launch EC2 instance (create puttygen private key of .pem keypair file used/created with EC2 instance)
+3. Save system log to PC
+4. Login to wp-admin with user credentials in system log
+5. Upload plugin version 6.77 (restore backup option is available for free in this version)
+6. Go to plugins > plugin editor and select plugin. Select constants.php
+7. Change "AI1WM_MAX_FILE_SIZE" line to "define( ‘AI1WM_MAX_FILE_SIZE’, 536870912 * 5 );" to increase max upload size to 3GB
+8. Install Big File Uploads plugin by Infinite Uploads and increase max upload size to 3GB
+9. In AWS, select instance and "Connect." Go to SSH client tab
+10. Open Putty. Host Name: Public IPv4 address, Browse for putty private key in Connection > SSH > Auth
+11. Open and login as "bitnami". Navigate to folder and set write permissions (below)
+12. cd ../opt/bitnami/wordpress/wp-content
+13. sudo stat ai1wm-backups
+14. sudo chown bitnami ai1wm-backups
+15. sudo chmod +w ai1wm-backups
+16. Add site to FileZilla File > Site Manager (host: Public IPv4 address, user: bitnami, Browse for putty key file)
+17. Remote site: /bitnami/wordpress/wp-content/ai1wm-backups
+18. Upload backup from local to remote
+19. Reset write permissions (below) THIS MUST BE DONE
+20. sudo chown daemon:daemon ai1wm-backups
+21. sudo chmod 0775 ai1wm-backups
+22. Go back to migration plugin > backups > restore (May need to re-install 6.77 and change max file upload size again)
+23. Update database and login with imported wp-admin credentials
+24. User passwords don't work after restore. Have to give write permissions to themes/Avada using steps above
+and edit themes/Avada/functions.php, adding wp_set_password( 'password', 1 ); on line 2.
+After logging in, remove this line and reset permissions using steps above
+
+
+
+
+
